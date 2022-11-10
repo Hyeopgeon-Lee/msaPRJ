@@ -18,46 +18,42 @@
     <link rel="stylesheet" href="/css/table.css"/>
 </head>
 <body>
-<h2>회원 가입하기</h2>
+<h2>회원정보 보기</h2>
 <hr/>
 <br/>
-<form name="f" method="post" action="/user/insertUserInfo" onsubmit="return doRegUserCheck(this);">
-
-    <div class="divTable minimalistBlack">
-        <div class="divTableBody">
-            <div class="divTableRow">
-                <div class="divTableCell">아이디
-                </div>
-                <div class="divTableCell"><%=CmmUtil.nvl(rDTO.getUserId())%>
-                </div>
+<div class="divTable minimalistBlack">
+    <div class="divTableBody">
+        <div class="divTableRow">
+            <div class="divTableCell">아이디
             </div>
-            <div class="divTableRow">
-                <div class="divTableCell">이름
-                </div>
-                <div class="divTableCell"><%=CmmUtil.nvl(rDTO.getUserName())%>
-                </div>
+            <div class="divTableCell"><%=CmmUtil.nvl(rDTO.getUserId())%>
             </div>
-            <div class="divTableRow">
-                <div class="divTableCell">이메일
-                </div>
-                <div class="divTableCell"><%=CmmUtil.nvl(rDTO.getEmail())%>
-                </div>
+        </div>
+        <div class="divTableRow">
+            <div class="divTableCell">이름
             </div>
-            <div class="divTableRow">
-                <div class="divTableCell">주소
-                </div>
-                <div class="divTableCell"><%=CmmUtil.nvl(rDTO.getAddr1())%>
-                </div>
+            <div class="divTableCell"><%=CmmUtil.nvl(rDTO.getUserName())%>
             </div>
-            <div class="divTableRow">
-                <div class="divTableCell">상세 주소
-                </div>
-                <div class="divTableCell"><%=CmmUtil.nvl(rDTO.getAddr2())%>
-                </div>
+        </div>
+        <div class="divTableRow">
+            <div class="divTableCell">이메일
+            </div>
+            <div class="divTableCell"><%=CmmUtil.nvl(rDTO.getEmail())%>
+            </div>
+        </div>
+        <div class="divTableRow">
+            <div class="divTableCell">주소
+            </div>
+            <div class="divTableCell"><%=CmmUtil.nvl(rDTO.getAddr1())%>
+            </div>
+        </div>
+        <div class="divTableRow">
+            <div class="divTableCell">상세 주소
+            </div>
+            <div class="divTableCell"><%=CmmUtil.nvl(rDTO.getAddr2())%>
             </div>
         </div>
     </div>
-    <div><input type="submit" value="회원가입"/></div>
-</form>
+</div>
 </body>
 </html>
