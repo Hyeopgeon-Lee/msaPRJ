@@ -114,7 +114,7 @@ public class JwtTokenProvider {
 
         // Spring Security가 로그인 성공된 정보를 Spring Security에서 사용하기 위해
         // Spring Security용 UsernamePasswordAuthenticationToken 생성
-        return new UsernamePasswordAuthenticationToken(userId, token, pSet);
+        return new UsernamePasswordAuthenticationToken(userId, "", pSet);
     }
 
     /**

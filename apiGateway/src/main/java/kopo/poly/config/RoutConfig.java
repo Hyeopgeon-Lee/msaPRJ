@@ -7,9 +7,6 @@ import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.web.reactive.function.server.RouterFunction;
-import org.springframework.web.reactive.function.server.RouterFunctions;
 import reactor.core.publisher.Mono;
 
 @Slf4j
@@ -68,28 +65,31 @@ public class RoutConfig {
     @Bean
     public RouteLocator gatewayRoutes(RouteLocatorBuilder builder) {
         return builder.routes()
-                .route(r -> r.path("/notice/**") //라우터 등록
+                .route(r -> r.path("/notice/**") // 공지사항
+                        // 라우터 등록
                         .filters(
                                 // URL별 독립적으로 저장 항목을 추가할 경우 정의함
-                                f -> f.addRequestHeader("notice-request", "notice-request-value")
-                                        .addResponseHeader("notice-response", "notice-response-value")
+                                f -> f.addRequestHeader("notice-request", "From API Gateway!!")
+                                        .addResponseHeader("notice-response", "From API Gateway!!")
 
                         )
                         .uri("http://localhost:12000") // 연결될 서버 주소
 
-                ).route(r -> r.path("/user/**") //라우터 등록
+                ).route(r -> r.path("/user/**") // 회원정보 수정
+                        // 라우터 등록
                         .filters(
                                 // URL별 독립적으로 저장 항목을 추가할 경우 정의함
-                                f -> f.addRequestHeader("user-request", "user-request-value")
-                                        .addResponseHeader("user-response", "user-response-value")
+                                f -> f.addRequestHeader("user-request", "From API Gateway!!")
+                                        .addResponseHeader("user-response", "From API Gateway!!")
                         )
                         .uri("http://localhost:11000") // 연결될 서버 주소
 
-                ).route(r -> r.path("/jwt/**") //라우터 등록 => JWT 토큰 발급 및 로그인 처리 수행하는 서비스
+                ).route(r -> r.path("/jwt/**") // 로그인, 회원가입 => 로그인이 필요하지 않는 서비스를 별로 URL로 분리
+                        //라우터 등록 = > JWT 토큰 발급 및 로그인 처리 수행하는 서비스
                         .filters(
                                 // URL별 독립적으로 저장 항목을 추가할 경우 정의함
-                                f -> f.addRequestHeader("jwt-request", "jwt-request-value")
-                                        .addResponseHeader("jwt-response", "jwt-response-value")
+                                f -> f.addRequestHeader("jwt-request", "From API Gateway!!")
+                                        .addResponseHeader("jwt-response", "From API Gateway!!")
                         )
                         .uri("http://localhost:11000") // 연결될 서버 주소
                 )
@@ -101,9 +101,9 @@ public class RoutConfig {
      * 보통 Front-End 서비스도 Gateway를 통해 접속해야 한다면 설정하며,
      * 자바스크립트, css, 이미지, html 등 정적인 객체에 사용함
      */
-    @Bean
-    RouterFunction staticResourceLocator() {
-        return RouterFunctions.resources("/css/**", new ClassPathResource("css/**"));
-
-    }
+//    @Bean
+//    RouterFunction staticResourceLocator() {
+//        return RouterFunctions.resources("/css/**", new ClassPathResource("css/**"));
+//
+//    }
 }
