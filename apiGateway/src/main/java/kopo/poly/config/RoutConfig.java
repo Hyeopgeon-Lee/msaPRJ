@@ -96,14 +96,4 @@ public class RoutConfig {
                 .build();
     }
 
-    /**
-     * 정적 객체에 대한 저장소 설정
-     * 보통 Front-End 서비스도 Gateway를 통해 접속해야 한다면 설정하며,
-     * 자바스크립트, css, 이미지, html 등 정적인 객체에 사용함
-     */
-//    @Bean
-//    RouterFunction staticResourceLocator() {
-//        return RouterFunctions.resources("/css/**", new ClassPathResource("css/**"));
-//
-//    }
 }
