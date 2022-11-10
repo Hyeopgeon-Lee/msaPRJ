@@ -54,3 +54,4 @@ public class NoticeEntity {
     private String chgDt;
 
 }
+

@@ -5,13 +5,13 @@ import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.oas.annotations.EnableOpenApi;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.Contact;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
-@EnableSwagger2
+@EnableOpenApi
 @Configuration
 public class SwaggerConfig {
 
@@ -33,7 +33,7 @@ public class SwaggerConfig {
     @Bean
     public Docket api() {
         return new Docket(DocumentationType.OAS_30) // openApi 3.0 버전 사용
-                .useDefaultResponseMessages(false) // 기본 응답 코드 노출 제외
+                .useDefaultResponseMessages(true) // 기본 응답 코드 노출 제외
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("kopo.poly.controller")) // API 정의한 Controller 패키지
                 .paths(PathSelectors.any()) // Controller의 모든 API를 문서화하기
@@ -41,6 +41,5 @@ public class SwaggerConfig {
                 .apiInfo(apiInfo()); // 문서 정보 저장하기
 
     }
-
-
 }
+

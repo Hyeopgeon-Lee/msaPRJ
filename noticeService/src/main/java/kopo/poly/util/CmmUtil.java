@@ -25,20 +25,4 @@ public class CmmUtil {
 			return "";
 		}
 	}
-	
-	public static String checked(String[] str, String com_str){
-		for(int i=0;i<str.length;i++){
-			if(str[i].equals(com_str))
-				return " checked";
-		}
-		return "";
-	}
-	
-	public static String select(String str,String com_str){
-		if(str.equals(com_str)){
-			return " selected";
-		}else{
-			return "";
-		}
-	}
 }
