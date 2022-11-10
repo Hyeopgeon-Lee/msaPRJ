@@ -1,5 +1,10 @@
 package kopo.poly.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import kopo.poly.auth.JwtTokenProvider;
 import kopo.poly.auth.JwtTokenType;
 import kopo.poly.dto.NoticeDTO;
@@ -15,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +28,7 @@ import java.util.List;
  * Controller 선언해야만 Spring 프레임워크에서 Controller인지 인식 가능
  * 자바 서블릿 역할 수행
  * */
+@Tag(name = "공지사항", description = "공지사항 구현을 위한 API")
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping(value = "/notice")
@@ -38,6 +43,15 @@ public class NoticeController {
     @Resource(name = "NoticeService")
     private INoticeService noticeService;
 
+    @Operation(summary = "공지사항 인덱스 화면", description = "공지사항 처음 들어갈때 접속",
+            parameters = {
+                    @Parameter(name = "model", description = "JSP에 값을 전달하기 위한 객체")
+            },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "OK"),
+                    @ApiResponse(responseCode = "404", description = "Page Not Found!")
+            }
+    )
     @GetMapping(value = "index")
     public String Index() {
         return "/index";
@@ -47,6 +61,15 @@ public class NoticeController {
     /**
      * 게시판 리스트 보여주기
      */
+    @Operation(summary = "공지사항 리스트 화면", description = "공지사항 리스트 화면 보여주기",
+            parameters = {
+                    @Parameter(name = "model", description = "JSP에 값을 전달하기 위한 객체")
+            },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "OK"),
+                    @ApiResponse(responseCode = "404", description = "Page Not Found!")
+            }
+    )
     @GetMapping(value = "noticeList")
     public String noticeList(ModelMap model) {
 
@@ -78,6 +101,17 @@ public class NoticeController {
     /**
      * 게시판 상세보기
      */
+    @Operation(
+            summary = "공지사항 상세보기", description = "공지사항 리스트에서 제목을 클릭하여 상세보기 접속",
+            parameters = {
+                    @Parameter(name = "HttpServletRequest", description = "웹 화면에서 전달받는 정보"),
+                    @Parameter(name = "ModelMap", description = "JSP에 값을 전달하기 위한 객체")
+            },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "OK"),
+                    @ApiResponse(responseCode = "404", description = "Page Not Found!")
+            }
+    )
     @GetMapping(value = "noticeInfo")
     public String noticeInfo(HttpServletRequest request, ModelMap model) throws Exception {
 
@@ -112,11 +146,11 @@ public class NoticeController {
         // AccessToken에서 회원아이디 가져오기
         String token = CmmUtil.nvl(jwtTokenProvider.resolveToken(request, JwtTokenType.ACCESS_TOKEN));
 
-        log.info("token : "+ token);
+        log.info("token : " + token);
 
         String user_id = CmmUtil.nvl(jwtTokenProvider.getUserId(token));
 
-        log.info("user_id : "+ user_id);
+        log.info("user_id : " + user_id);
 
         // 조회된 리스트 결과값 넣어주기
         model.addAttribute("rDTO", rDTO);
@@ -131,6 +165,16 @@ public class NoticeController {
     /**
      * 게시판 수정 보기
      */
+    @Operation(summary = "공지사항 수정하는 화면 이동", description = "공지사항 수정하는 화면 이동",
+            parameters = {
+                    @Parameter(in = ParameterIn.QUERY, name = "request", description = "웹 화면에서 전달받는 정보"),
+                    @Parameter(name = "model", description = "JSP에 값을 전달하기 위한 객체")
+            },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "OK"),
+                    @ApiResponse(responseCode = "404", description = "Page Not Found!")
+            }
+    )
     @GetMapping(value = "noticeEditInfo")
     public String noticeEditInfo(HttpServletRequest request, ModelMap model) {
 
@@ -163,11 +207,11 @@ public class NoticeController {
             // AccessToken에서 회원아이디 가져오기
             String token = CmmUtil.nvl(jwtTokenProvider.resolveToken(request, JwtTokenType.ACCESS_TOKEN));
 
-            log.info("token : "+ token);
+            log.info("token : " + token);
 
             String user_id = CmmUtil.nvl(jwtTokenProvider.getUserId(token));
 
-            log.info("user_id : "+ user_id);
+            log.info("user_id : " + user_id);
 
             // 조회된 리스트 결과값 넣어주기
             model.addAttribute("rDTO", rDTO);
@@ -194,16 +238,28 @@ public class NoticeController {
     /**
      * 게시판 글 수정
      */
+    @Operation(summary = "공지사항 수정하기", description = "DB에 공지사항 상세 데이터를 수정하기 위한 요청",
+            parameters = {
+                    @Parameter(in = ParameterIn.QUERY, name = "request", description = "웹 화면에서 전달받는 정보"),
+                    @Parameter(name = "model", description = "JSP에 값을 전달하기 위한 객체")
+            },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "OK"),
+                    @ApiResponse(responseCode = "404", description = "Page Not Found!")
+            }
+    )
     @PostMapping(value = "noticeUpdate")
-    public String NoticeUpdate(HttpSession session, HttpServletRequest request, ModelMap model) {
+    public String NoticeUpdate(HttpServletRequest request, ModelMap model) {
 
         log.info(this.getClass().getName() + ".noticeUpdate Start!");
 
         String msg = "";
 
         try {
+            // JWT Access Token 가져오기
+            String token = CmmUtil.nvl(jwtTokenProvider.resolveToken(request, JwtTokenType.ACCESS_TOKEN));
 
-            String user_id = CmmUtil.nvl((String) session.getAttribute("SESSION_USER_ID")); // 아이디
+            String user_id = CmmUtil.nvl(jwtTokenProvider.getUserId(token)); // 토큰에서 추출한 회원아이디
             String nSeq = CmmUtil.nvl(request.getParameter("nSeq")); // 글번호(PK)
             String title = CmmUtil.nvl(request.getParameter("title")); // 제목
             String noticeYn = CmmUtil.nvl(request.getParameter("noticeYn")); // 공지글 여부
@@ -247,6 +303,16 @@ public class NoticeController {
     /**
      * 게시판 글 삭제
      */
+    @Operation(summary = "공지사항 삭제하기", description = "DB에 공지사항 상세 데이터를 삭제하기 위한 요청",
+            parameters = {
+                    @Parameter(in = ParameterIn.QUERY, name = "request", description = "웹 화면에서 전달받는 정보"),
+                    @Parameter(name = "model", description = "JSP에 값을 전달하기 위한 객체")
+            },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "OK"),
+                    @ApiResponse(responseCode = "404", description = "Page Not Found!")
+            }
+    )
     @GetMapping(value = "noticeDelete")
     public String noticeDelete(HttpServletRequest request, ModelMap model) {
 
@@ -293,6 +359,16 @@ public class NoticeController {
      * <p>
      * GetMapping(value = "notice/NoticeReg") =>  GET방식을 통해 접속되는 URL이 notice/NoticeReg인 경우 아래 함수를 실행함
      */
+    @Operation(summary = "공지사항 등록화면", description = "공지사항 글을 작성하기 위한 화면",
+            parameters = {
+                    @Parameter(in = ParameterIn.QUERY, name = "request", description = "웹 화면에서 전달받는 정보"),
+                    @Parameter(name = "model", description = "JSP에 값을 전달하기 위한 객체")
+            },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "OK"),
+                    @ApiResponse(responseCode = "404", description = "Page Not Found!")
+            }
+    )
     @GetMapping(value = "noticeReg")
     public String noticeReg() {
 
@@ -306,8 +382,18 @@ public class NoticeController {
     /**
      * 게시판 글 등록
      */
+    @Operation(summary = "공지사항 등록하기", description = "DB에 공지사항 등록하기 위한 요청",
+            parameters = {
+                    @Parameter(in = ParameterIn.QUERY, name = "request", description = "웹 화면에서 전달받는 정보"),
+                    @Parameter(name = "model", description = "JSP에 값을 전달하기 위한 객체")
+            },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "OK"),
+                    @ApiResponse(responseCode = "404", description = "Page Not Found!")
+            }
+    )
     @PostMapping(value = "noticeInsert")
-    public String noticeInsert(HttpSession session, HttpServletRequest request, ModelMap model) {
+    public String noticeInsert(HttpServletRequest request, ModelMap model) {
 
         log.info(this.getClass().getName() + ".noticeInsert Start!");
 
@@ -317,7 +403,10 @@ public class NoticeController {
             /*
              * 게시판 글 등록되기 위해 사용되는 form객체의 하위 input 객체 등을 받아오기 위해 사용함
              */
-            String user_id = CmmUtil.nvl((String) session.getAttribute("SESSION_USER_ID"));
+            // JWT Access Token 가져오기
+            String token = CmmUtil.nvl(jwtTokenProvider.resolveToken(request, JwtTokenType.ACCESS_TOKEN));
+
+            String user_id = CmmUtil.nvl(jwtTokenProvider.getUserId(token)); // 토큰에서 추출한 회원아이디
             String title = CmmUtil.nvl(request.getParameter("title")); // 제목
             String noticeYn = CmmUtil.nvl(request.getParameter("noticeYn")); // 공지글 여부
             String contents = CmmUtil.nvl(request.getParameter("contents")); // 내용
