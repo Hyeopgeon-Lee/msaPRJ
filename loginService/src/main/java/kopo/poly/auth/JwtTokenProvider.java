@@ -152,25 +152,6 @@ public class JwtTokenProvider {
     }
 
     /**
-     * JWT 토큰(Access Token, Refresh Token)에서 회원 정보 추출
-     *
-     * @param token 토큰
-     * @return 회원 아이디(ex. hglee67)
-     */
-    public String getUserRoles(String token) {
-
-        log.info(this.getClass().getName() + ".getUserRoles Start!");
-        String roles = CmmUtil.nvl((String) Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token)
-                .getBody().get("roles"));
-
-        log.info("roles : " + roles);
-
-        log.info(this.getClass().getName() + ".getUserRoles End!");
-
-        return roles;
-    }
-
-    /**
      * 쿠기에 저장된 JWT 토큰(Access Token, Refresh Token) 가져오기
      *
      * @param request   request 정보
@@ -207,43 +188,6 @@ public class JwtTokenProvider {
 
         log.info(this.getClass().getName() + ".resolveToken End!");
         return token;
-    }
-
-    /**
-     * JWT 토큰(Access Token, Refresh Token) 상태 확인
-     *
-     * @param token 토큰
-     * @return 상태정보(EXPIRED, ACCESS, DENIED)
-     */
-    public JwtStatus validateToken(String token) {
-
-        if (token.length() > 0) {
-
-            try {
-                Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
-
-                // 토큰 만료여부 체크
-                if (claims.getBody().getExpiration().before(new Date())) {
-                    return JwtStatus.EXPIRED; // 기간 만료
-
-                } else {
-                    return JwtStatus.ACCESS; // 유효한 토큰
-                }
-
-            } catch (ExpiredJwtException e) {
-                // 만료된 경우에는 refresh token을 확인하기 위해
-                return JwtStatus.EXPIRED; // 혹시 몰라서 Exception으로 한번 더 체크 기간 만료
-
-            } catch (JwtException | IllegalArgumentException e) {
-                log.info("jwtException : {}", e);
-
-                return JwtStatus.DENIED;
-            }
-
-        } else {
-            return JwtStatus.DENIED;
-        }
-
     }
 
 }
