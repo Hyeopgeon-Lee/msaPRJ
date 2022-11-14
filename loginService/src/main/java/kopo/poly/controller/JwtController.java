@@ -65,7 +65,6 @@ public class JwtController {
     @Operation(summary = "회원가입 수행", description = "DB에 회원정보 저장하기",
             parameters = {
                     @Parameter(name = "model", description = "JSP에 값을 전달하기 위한 객체"),
-                    @Parameter(name = "ModelMap", description = "JSP에 값을 전달하기 위한 객체")
             },
             responses = {
                     @ApiResponse(responseCode = "200", description = "OK"),
@@ -207,10 +206,10 @@ public class JwtController {
         return "/jwt/LoginForm";
     }
 
-    @Operation(summary = "로그인 처리 수행", description = "로그인 처리 수행하기",
+    @Operation(summary = "로그인 성공", description = "Spring Security에서 로그인 성공하면 호출하는 함수",
             parameters = {
                     @Parameter(name = "model", description = "JSP에 값을 전달하기 위한 객체"),
-                    @Parameter(name = "ModelMap", description = "JSP에 값을 전달하기 위한 객체")
+                    @Parameter(name = "authInfo", description = "Spring Security에서 인증된 회원 정보")
             },
             responses = {
                     @ApiResponse(responseCode = "200", description = "OK"),
@@ -284,7 +283,7 @@ public class JwtController {
 
     }
 
-    @Operation(summary = "로그인 실패", description = "로그인 실패 수행하기",
+    @Operation(summary = "로그인 실패", description = "Spring Security에서 로그인 성공하면 호출하는 함수",
             responses = {
                     @ApiResponse(responseCode = "200", description = "OK"),
                     @ApiResponse(responseCode = "404", description = "Page Not Found!")

@@ -7,7 +7,6 @@ import kopo.poly.service.IUserInfoService;
 import kopo.poly.util.CmmUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,15 +19,11 @@ import javax.servlet.http.HttpServletRequest;
 @Controller
 public class UserController {
 
-    @Value("${jwt.token.access.name}")
-    private String accessTokenName;
-
     // JWT 객체
     private final JwtTokenProvider jwtTokenProvider;
 
     // 회원 서비스
     private final IUserInfoService userInfoService;
-
 
     /**
      * 본인 회원정보조회
@@ -66,3 +61,4 @@ public class UserController {
     }
 
 }
+

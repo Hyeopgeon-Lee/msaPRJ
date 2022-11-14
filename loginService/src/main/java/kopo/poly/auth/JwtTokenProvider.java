@@ -59,6 +59,7 @@ public class JwtTokenProvider {
 
         log.info("userId : " + userId);
 
+
         long validTime = 0;
 
         if (tokenType == JwtTokenType.ACCESS_TOKEN) { // Access Token이라면
@@ -191,3 +192,4 @@ public class JwtTokenProvider {
     }
 
 }
+
