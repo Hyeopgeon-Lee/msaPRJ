@@ -41,7 +41,7 @@ public class JwtTokenProvider {
     private String refreshTokenName;
 
     /**
-     * JWT 토큰(Access Token, Refresh Token)생성
+     * JWT 토큰(Access Token)생성
      *
      * @param userId    회원 아이디(ex. hglee67)
      * @param roles     회원 권한
@@ -53,16 +53,6 @@ public class JwtTokenProvider {
         log.info(this.getClass().getName() + ".createToken Start!");
 
         log.info("userId : " + userId);
-
-        long validTime = 0;
-
-        if (tokenType == JwtTokenType.ACCESS_TOKEN) { // Access Token이라면
-            validTime = (accessTokenValidTime);
-
-        } else if (tokenType == JwtTokenType.REFRESH_TOKEN) { // Refresh Token이라면
-            validTime = (refreshTokenValidTime);
-
-        }
 
         Claims claims = Jwts.claims()
                 .setIssuer(creator) // JWT 토큰 생성자 기입함
@@ -77,7 +67,7 @@ public class JwtTokenProvider {
         return Jwts.builder()
                 .setClaims(claims) // 정보 저장
                 .setIssuedAt(now) // 토큰 발행 시간 정보
-                .setExpiration(new Date(now.getTime() + (validTime * 1000))) // set Expire Time
+                .setExpiration(new Date(now.getTime() + (accessTokenValidTime * 1000))) // set Expire Time
                 .signWith(SignatureAlgorithm.HS256, secretKey)  // 사용할 암호화 알고리즘과
                 .compact();
     }
@@ -226,5 +216,5 @@ public class JwtTokenProvider {
         }
 
     }
-
 }
+

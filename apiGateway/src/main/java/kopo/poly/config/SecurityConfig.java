@@ -2,10 +2,8 @@ package kopo.poly.config;
 
 import kopo.poly.filter.JwtAuthenticationFilter;
 import kopo.poly.handler.AccessDeniedHandler;
-import kopo.poly.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
@@ -20,23 +18,8 @@ import org.springframework.security.web.server.context.NoOpServerSecurityContext
 @EnableWebFluxSecurity
 public class SecurityConfig {
 
-    @Value("${jwt.token.access.valid.time}")
-    private long accessTokenValidTime;
-
-    @Value("${jwt.token.access.name}")
-    private String accessTokenName;
-
-    @Value("${jwt.token.refresh.valid.time}")
-    private long refreshTokenValidTime;
-
-    @Value("${jwt.token.refresh.name}")
-    private String refreshTokenName;
-
     // Access Denied 처리
     private final AccessDeniedHandler accessDeniedHandler;
-
-    // JWT Token 객체
-    private final JwtTokenProvider jwtTokenProvider;
 
     // JWT 검증을 위한 필터
     // 초기 Spring Filter를 Spring에 제어가 불가능했지만, 현재 제어 가능함
@@ -80,3 +63,4 @@ public class SecurityConfig {
         return http.build();
     }
 }
+
