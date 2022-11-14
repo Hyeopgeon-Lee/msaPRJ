@@ -8,7 +8,6 @@
         rDTO = new UserInfoDTO();
 
     }
-
 %>
 <!DOCTYPE html>
 <html>

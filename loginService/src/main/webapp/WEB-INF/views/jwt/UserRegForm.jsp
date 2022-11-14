@@ -74,8 +74,6 @@
             }).open();
         }
     </script>
-
-
 </head>
 <body>
 <h2>회원 가입하기</h2>
