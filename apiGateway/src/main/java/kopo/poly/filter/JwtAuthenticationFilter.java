@@ -88,7 +88,7 @@ public class JwtAuthenticationFilter implements WebFilter {
         ServerHttpRequest request = exchange.getRequest();
         ServerHttpResponse response = exchange.getResponse();
 
-        log.info(this.getClass().getName() + ".doFilterInternal Start!");
+        log.info(this.getClass().getName() + ".filter Start!");
 
         // 쿠키에서 Access Token 가져오기
         String accessToken = CmmUtil.nvl(jwtTokenProvider.resolveToken(request, JwtTokenType.ACCESS_TOKEN));
@@ -159,7 +159,7 @@ public class JwtAuthenticationFilter implements WebFilter {
 
         }
 
-        log.info(this.getClass().getName() + ".doFilterInternal End!");
+        log.info(this.getClass().getName() + ".filter End!");
 
         return chain.filter(exchange);
     }

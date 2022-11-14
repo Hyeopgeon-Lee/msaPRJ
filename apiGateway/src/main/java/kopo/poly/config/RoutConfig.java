@@ -19,7 +19,7 @@ public class RoutConfig {
      */
     @Bean
     @Order(-1)
-    public GlobalFilter b() {
+    public GlobalFilter first() {
         return (exchange, chain) -> {
             log.info("First pre filter");
             return chain.filter(exchange).then(Mono.fromRunnable(() -> {
@@ -34,7 +34,7 @@ public class RoutConfig {
      */
     @Bean
     @Order(0)
-    public GlobalFilter c() {
+    public GlobalFilter second() {
         return (exchange, chain) -> {
             log.info("Second pre filter");
             return chain.filter(exchange).then(Mono.fromRunnable(() -> {
@@ -49,7 +49,7 @@ public class RoutConfig {
      */
     @Bean
     @Order(1)
-    public GlobalFilter a() {
+    public GlobalFilter third() {
         return (exchange, chain) -> {
             log.info("Third pre filter");
             return chain.filter(exchange).then(Mono.fromRunnable(() -> {
@@ -75,7 +75,7 @@ public class RoutConfig {
                         )
                         .uri("http://localhost:12000") // 연결될 서버 주소
 
-                ).route(r -> r.path("/user/**") // 회원정보 수정
+                ).route(r -> r.path("/user/**") // 회원정보 확인
                         // 라우터 등록
                         .filters(
                                 // URL별 독립적으로 저장 항목을 추가할 경우 정의함
@@ -95,5 +95,5 @@ public class RoutConfig {
                 )
                 .build();
     }
-
 }
+
