@@ -1,6 +1,7 @@
 package kopo.poly.jwt;
 
 import io.jsonwebtoken.*;
+import kopo.poly.dto.TokenDTO;
 import kopo.poly.util.CmmUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -73,6 +74,35 @@ public class JwtTokenProvider {
     }
 
     /**
+     * JWT 토큰(Access Token, Refresh Token)에 저장된 값 가져오기
+     *
+     * @param token 토큰
+     * @return 회원 아이디(ex. hglee67)
+     */
+    public TokenDTO getTokenInfo(String token) {
+
+        log.info(this.getClass().getName() + ".getTokenInfo Start!");
+
+        // JWT 토큰 정보
+        Claims claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
+
+        String userId = CmmUtil.nvl(claims.getSubject());
+        String role = CmmUtil.nvl((String) claims.get("role"));
+
+        log.info("userId : " + userId);
+        log.info("role : " + role);
+
+        TokenDTO pDTO = new TokenDTO();
+
+        pDTO.setUserId(userId);
+        pDTO.setRole(role);
+
+        log.info(this.getClass().getName() + ".getTokenInfo End!");
+
+        return pDTO;
+    }
+    
+    /**
      * JWT 토큰(Access Token, Refresh Token)에서 인증 정보 조회 및
      * 아이디, 패스워드가 맞다면, Spring Security를 통해 로그인처리하기
      *
@@ -84,12 +114,15 @@ public class JwtTokenProvider {
         log.info(this.getClass().getName() + ".getAuthentication Start!");
         log.info("getAuthentication : " + token);
 
+        TokenDTO rDTO = getTokenInfo(token); // 토큰에 저장된 정보 가져오기
+
         // JWT 토큰에 저장된 사용자 아이디 : hglee67
-        String userId = CmmUtil.nvl(this.getUserId(token));
-        log.info("user_id : " + userId);
+        String userId = CmmUtil.nvl(rDTO.getUserId());
 
         // JWT 토큰에 저장된 사용자 아이디 : ROLE_USER
-        String roles = CmmUtil.nvl(this.getUserRoles(token));
+        String roles = CmmUtil.nvl(rDTO.getRole());
+
+        log.info("user_id : " + userId);
         log.info("roles : " + roles);
 
         Set<GrantedAuthority> pSet = new HashSet<>();
@@ -105,44 +138,6 @@ public class JwtTokenProvider {
         // Spring Security가 로그인 성공된 정보를 Spring Security에서 사용하기 위해
         // Spring Security용 UsernamePasswordAuthenticationToken 생성
         return new UsernamePasswordAuthenticationToken(userId, "", pSet);
-    }
-
-    /**
-     * JWT 토큰(Access Token, Refresh Token)에서 회원 정보 추출
-     *
-     * @param token 토큰
-     * @return 회원 아이디(ex. hglee67)
-     */
-    public String getUserId(String token) {
-
-        log.info(this.getClass().getName() + ".getUserId Start!");
-
-        String userId = CmmUtil.nvl(Jwts.parser().setSigningKey(secretKey)
-                .parseClaimsJws(token).getBody().getSubject());
-        log.info("userId : " + userId);
-
-        log.info(this.getClass().getName() + ".getUserId End!");
-
-        return userId;
-    }
-
-    /**
-     * JWT 토큰(Access Token, Refresh Token)에서 회원 정보 추출
-     *
-     * @param token 토큰
-     * @return 회원 아이디(ex. hglee67)
-     */
-    public String getUserRoles(String token) {
-
-        log.info(this.getClass().getName() + ".getUserRoles Start!");
-        String roles = CmmUtil.nvl((String) Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token)
-                .getBody().get("roles"));
-
-        log.info("roles : " + roles);
-
-        log.info(this.getClass().getName() + ".getUserRoles End!");
-
-        return roles;
     }
 
     /**

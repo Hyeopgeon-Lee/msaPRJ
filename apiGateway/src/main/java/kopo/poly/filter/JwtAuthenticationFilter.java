@@ -1,5 +1,10 @@
 package kopo.poly.filter;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import kopo.poly.dto.MsgDTO;
+import kopo.poly.dto.TokenDTO;
+import kopo.poly.handler.ErrorMsg;
 import kopo.poly.jwt.JwtStatus;
 import kopo.poly.jwt.JwtTokenProvider;
 import kopo.poly.jwt.JwtTokenType;
@@ -7,6 +12,10 @@ import kopo.poly.util.CmmUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
@@ -17,6 +26,8 @@ import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
+
+import java.nio.charset.StandardCharsets;
 
 @Slf4j
 @Component
@@ -31,6 +42,38 @@ public class JwtAuthenticationFilter implements WebFilter {
 
     // JWT Token 객체
     private final JwtTokenProvider jwtTokenProvider;
+
+    // 인증되지 않은 경우, 에러 메시지 출력하기
+    private Mono<Void> handleUnAuthorized(ServerWebExchange exchange, MsgDTO pDTO) {
+
+        log.info(this.getClass().getName() + ".handleUnAuthorized Start!");
+
+        ServerHttpResponse response = exchange.getResponse();
+
+        response.setStatusCode(HttpStatus.UNAUTHORIZED);
+
+        response.getHeaders().add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+
+        // DTO를 JSON 구조로 변경하기
+        String json = null;
+
+        try {
+            json = new ObjectMapper().writeValueAsString(pDTO);
+
+        } catch (JsonProcessingException e) {
+            log.info("JSON Parsing Error!");
+
+        }
+
+        byte[] bytes = json.getBytes(StandardCharsets.UTF_8);
+        DataBuffer buffer = response.bufferFactory().wrap(bytes);
+
+        log.info("buffer : " + buffer);
+
+        log.info(this.getClass().getName() + ".handleUnAuthorized End!");
+        return response.writeWith(Mono.just(buffer));
+
+    }
 
     /**
      * 쿠기에 저장된 JWT 토근 삭제할 구조 정의
@@ -125,8 +168,12 @@ public class JwtAuthenticationFilter implements WebFilter {
 
             // Refresh Token이 유효하면, Access Token 재발급
             if (refreshTokenStatus == JwtStatus.ACCESS) {
-                String userId = CmmUtil.nvl(jwtTokenProvider.getUserId(refreshToken)); // 회원 아이디
-                String userRoles = CmmUtil.nvl(jwtTokenProvider.getUserRoles(refreshToken)); // 회원 권한
+
+                // Refresh Token에 저장된 정보 가져오기
+                TokenDTO rDTO = jwtTokenProvider.getTokenInfo(refreshToken);
+
+                String userId = CmmUtil.nvl(rDTO.getUserId()); // 회원 아이디
+                String userRoles = CmmUtil.nvl(rDTO.getRole()); // 회원 권한
 
                 log.info("refreshToken userId : " + userId);
                 log.info("refreshToken userRoles : " + userRoles);
@@ -149,11 +196,23 @@ public class JwtAuthenticationFilter implements WebFilter {
 
             } else if (refreshTokenStatus == JwtStatus.EXPIRED) {
                 log.info("Refresh Token 만료");
-                return chain.filter(exchange);
+
+                // 에러 메시지 구조
+                MsgDTO pDTO = new MsgDTO();
+                pDTO.setCode("510");
+                pDTO.setMsg(ErrorMsg.ERR510.getValue());
+
+                return handleUnAuthorized(exchange, pDTO);
 
             } else {
                 log.info("Refresh Token 오류");
-                return chain.filter(exchange);
+
+                // 에러 메시지 구조
+                MsgDTO pDTO = new MsgDTO();
+                pDTO.setCode("310");
+                pDTO.setMsg(ErrorMsg.ERR310.getValue());
+
+                return handleUnAuthorized(exchange, pDTO);
 
             }
 
